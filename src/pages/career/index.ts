@@ -118,7 +118,7 @@ export function renderPage() {
       </article>
     </div>
   `
-  const clientScript = '/src/pages/career/client.ts'
+  const clientScript = 'src/pages/career/client.ts'
 
   return { html, clientScript }
 }

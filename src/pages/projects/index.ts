@@ -391,7 +391,7 @@ export function renderPage() {
       </article>
     </div>
   `
-  const clientScript = '/src/pages/projects/client.ts'
+  const clientScript = 'src/pages/projects/client.ts'
 
   return { html, clientScript }
 }

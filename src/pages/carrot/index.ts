@@ -16,7 +16,7 @@ export async function renderPage() {
     </div>
 </div>
 `
-  const clientScript = '/src/pages/carrot/client.ts'
+  const clientScript = 'src/pages/carrot/client.ts'
 
   return { html, clientScript }
 }
