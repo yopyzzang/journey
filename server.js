@@ -12,14 +12,14 @@ const templateHtml = isProduction
 
 function resolveClientScript(sourcePath) {
   if (process.env.NODE_ENV !== 'production') {
-    return `${sourcePath}`
+    return `/${sourcePath}`
   }
 
   const entry = manifest[sourcePath]
   if (!entry) {
     throw new Error(`manifest에서 ${sourcePath} 엔트리를 찾을 수 없습니다.`)
   }
-  return `${entry.file}`
+  return `/${entry.file}`
 }
 
 const app = express()
