@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import manifest from './dist/client/.vite/manifest.json' with { type: 'json' }
+import manifest from './dist/server/.vite/manifest.json' with { type: 'json' }
 
 const isProduction = process.env.NODE_ENV === 'production'
 const port = process.env.PORT || 5173
