@@ -1,0 +1,28 @@
+services:
+  client:
+    image: ghcr.io/journey:latest
+    container_name: moachat_client
+    restart: unless-stopped
+    expose:
+      - 5173
+
+  nginx:
+    build: ./nginx
+    container_name: journey_nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - client
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
