@@ -3,17 +3,16 @@ const pages: Record<string, Function | undefined> = import.meta.glob(
 )
 
 export async function render(url: string) {
-  const filePath = `./pages/${url === '/' ? '/home' : url}/index.ts`
-  const pageModule = pages[filePath]
+  const filePath = url ? `./pages/${url}/index.ts` : './pages/index.ts'
 
-  console.log(pages)
-  console.log('filePath', filePath)
-  console.log('pageModule', pageModule)
+  const pageModule = pages[filePath]
 
   if (!pageModule) {
     return '<h1>Page not found</h1>'
   }
 
   const module = await pageModule()
-  return module.renderPage()
+  const { html, clientScript } = await module.renderPage()
+
+  return { html, clientScript }
 }
