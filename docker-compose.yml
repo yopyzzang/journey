@@ -1,3 +1,5 @@
+name: journey
+
 services:
   client:
     image: ghcr.io/yopyzzang/journey:latest
