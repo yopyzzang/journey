@@ -1,6 +1,6 @@
 services:
   client:
-    image: ghcr.io/journey:latest
+    image: ghcr.io/yopyzzang/journey:latest
     container_name: moachat_client
     restart: unless-stopped
     expose:
