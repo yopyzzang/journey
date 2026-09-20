@@ -12,3 +12,6 @@ yarn-error.log*
 .idea
 /dist
 .DS_Store
+
+/src/pages/resume
+/public/images
