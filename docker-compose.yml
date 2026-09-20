@@ -1,7 +1,7 @@
 services:
   client:
     image: ghcr.io/yopyzzang/journey:latest
-    container_name: moachat_client
+    container_name: journey_client
     restart: unless-stopped
     expose:
       - 5173
