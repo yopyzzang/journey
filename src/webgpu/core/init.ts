@@ -8,7 +8,7 @@ export async function initWebGPU() {
   }
 
   const device = await adapter.requestDevice()
-  const dpr = window.devicePixelRatio || 1
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
   const canvas = document.querySelector('canvas') as HTMLCanvasElement
   const context = canvas.getContext('webgpu') as GPUCanvasContext
   const format = navigator.gpu.getPreferredCanvasFormat()
