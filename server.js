@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import manifest from './dist/server/.vite/manifest.json' with { type: 'json' }
+import manifest from './dist/client/.vite/manifest.json' with { type: 'json' }
 
 const isProduction = process.env.NODE_ENV === 'production'
 const port = process.env.PORT || 5173
@@ -10,16 +10,37 @@ const templateHtml = isProduction
   ? await fs.readFile('./dist/client/index.html', 'utf-8')
   : ''
 
-function resolveClientScript(sourcePath) {
+function collectCss(entryKey, manifest, seen = new Set()) {
+  if (seen.has(entryKey)) return []
+  seen.add(entryKey)
+
+  const chunk = manifest[entryKey]
+  if (!chunk) return []
+
+  const css = [...(chunk.css ?? [])]
+
+  for (const importedKey of chunk.imports ?? []) {
+    css.push(...collectCss(importedKey, manifest, seen))
+  }
+
+  return css
+}
+
+function resolveClientAssets(sourcePath) {
   if (process.env.NODE_ENV !== 'production') {
-    return `/${sourcePath}`
+    return { script: `/${sourcePath}`, css: [] }
   }
 
   const entry = manifest[sourcePath]
   if (!entry) {
     throw new Error(`manifest에서 ${sourcePath} 엔트리를 찾을 수 없습니다.`)
   }
-  return `/${entry.file}`
+  const cssFiles = [...new Set(collectCss(sourcePath, manifest))]
+
+  return {
+    script: `/${entry.file}`,
+    css: cssFiles.map((href) => `/${href}`),
+  }
 }
 
 const app = express()
@@ -59,16 +80,19 @@ app.use('*all', async (req, res) => {
     }
 
     const rendered = await render(url)
-    const scriptSrc = rendered.clientScript
-      ? resolveClientScript(rendered.clientScript)
-      : null
+    const { script, css } = rendered.clientScript
+      ? resolveClientAssets(rendered.clientScript)
+      : { script: null, css: [] }
+    const cssLinks = css
+      .map((href) => `<link rel="stylesheet" href="${href}">`)
+      .join('\n')
 
     const html = template
-      .replace(`<!--app-head-->`, rendered.head ?? '')
+      .replace(`<!--app-head-->`, (rendered.head ?? '') + cssLinks)
       .replace(`<!--app-html-->`, rendered.html ?? '')
       .replace(
         `<!--app-script-->`,
-        scriptSrc ? `<script type="module" src="${scriptSrc}"></script>` : '',
+        script ? `<script type="module" src="${script}"></script>` : '',
       )
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
