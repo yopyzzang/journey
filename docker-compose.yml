@@ -1,4 +1,7 @@
 name: journey
+networks:
+  proxy:
+    external: true
 
 services:
   client:
@@ -12,19 +15,12 @@ services:
     build: ./nginx
     container_name: journey_nginx_proxy
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
     depends_on:
       - client
-
-  certbot:
-    image: certbot/certbot
-    container_name: journey_certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
+    networks:
+      - default
+      - proxy
