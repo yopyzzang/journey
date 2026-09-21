@@ -631,42 +631,50 @@ if (targetSource.translation[2] < FOLLOW_THRESHOLD_Z) {
 )
 
 const AUDIO = highlightCode(
-  `let bgm: HTMLAudioElement | null = null
-let hasStartedAudible = false
+  `export async function unlockBgm() {
+  if (!audioCtx || !bgmBuffer) {
+    await loadBgm()
+  }
 
-const BGM_SRC = '/music/The_Earnest_Star.mp3'
-const BGM_TARGET_VOLUME = 0.4
-const BGM_FADE_RATE = 0.15
-
-export function unlockBgm() {
-  if (bgm) return
-
-  bgm = new Audio(BGM_SRC)
-  bgm.loop = true
-  bgm.volume = 0
-  bgm.play().catch((err) => {
-    console.error(err.name, err.message)
-
-    if (err.name === 'NotAllowedError') {
-      bgm = null
-    }
-  })
+  if (audioCtx?.state === 'suspended') {
+    await audioCtx.resume()
+  }
 }
 
 export function updateBgm(dt: number) {
-  if (!bgm) return
+  if (!audioCtx || !bgmBuffer) return
 
   if (!hasStartedAudible) {
     hasStartedAudible = true
-    bgm.currentTime = 0
+
+    bgmSource = audioCtx.createBufferSource()
+    bgmSource.buffer = bgmBuffer
+    bgmSource.loop = true
+
+    gainNode = audioCtx.createGain()
+
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
+
+    bgmSource.connect(gainNode)
+    gainNode.connect(audioCtx.destination)
+
+    bgmSource.start(0)
   }
 
-  bgm.volume = Math.min(BGM_TARGET_VOLUME, bgm.volume + BGM_FADE_RATE * dt)  
+  if (gainNode) {
+    const currentVolume = gainNode.gain.value
+    if (currentVolume < BGM_TARGET_VOLUME) {
+      const nextVolume = Math.min(
+        BGM_TARGET_VOLUME,
+        currentVolume + BGM_FADE_RATE * dt,
+      )
+      gainNode.gain.setValueAtTime(nextVolume, audioCtx.currentTime)
+    }
+  }
 }
 
 // move.ts (animation)에서 특정 구간에 deltaTime를 인자 값으로 주어 음악을 재생했습니다.
-if (worldZ < WEATHER_ZONE.SNOW_START) updateBgm(dt)
-`,
+if (worldZ < WEATHER_ZONE.SNOW_START) updateBgm(dt)`,
   'typescript',
 )
 
@@ -719,10 +727,11 @@ export function fly(
   animationNode: SceneGraphNode[],
   time: number,
   interaction: ReturnType<typeof createInteractionState>,
+  rotationThreshold: number,
 ) {
   const absRotation = Math.abs(interaction.rotationY)
 
-  if (absRotation > 150 && flyStartTime === -1) {
+  if (absRotation > rotationThreshold && flyStartTime === -1) {
     flyStartTime = time
     startRotation = interaction.rotationY
     rotationDirection = Math.sign(interaction.rotationY)
