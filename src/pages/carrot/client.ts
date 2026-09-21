@@ -55,6 +55,7 @@ async function main() {
   const rainOptions = isMobile
     ? { count: 3000, spreadX: 500, spreadZ: 200, height: 4000 }
     : { count: 10000, spreadX: 1000, spreadZ: 400, height: 4000 }
+  const ROTATION_THRESHOLD = isMobile ? 40 : 80
 
   resizeObserver(canvas, device, dpr)
 
@@ -173,7 +174,7 @@ async function main() {
     }
 
     if (interaction.isAnimating) {
-      fly(animNodes, time, interaction)
+      fly(animNodes, time, interaction, ROTATION_THRESHOLD)
     } else {
       move(
         animNodes,
@@ -184,6 +185,7 @@ async function main() {
         rainNode,
         sunNode,
         state,
+        ROTATION_THRESHOLD,
       )
     }
 

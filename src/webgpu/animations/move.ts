@@ -339,13 +339,14 @@ function updateCombinedFlight(
   time: number,
   interaction: ReturnType<typeof createInteractionState>,
   state: { isEnded: boolean },
+  rotationThreshold: number,
 ) {
   interaction.velocity *= 0.95
   interaction.rotationY += interaction.velocity
   const absRotation = Math.abs(interaction.rotationY)
 
   if (reunion.flyStartTime === -1) {
-    if (absRotation > 100) {
+    if (absRotation > rotationThreshold) {
       reunion.flyStartTime = time
     }
   }
@@ -453,6 +454,7 @@ function updateSunAndLeaf(
   time: number,
   interaction: ReturnType<typeof createInteractionState>,
   state: { isEnded: boolean },
+  rotationThreshold: number,
 ) {
   if (!weather.rainFinished) return
 
@@ -496,6 +498,7 @@ function updateSunAndLeaf(
         time,
         interaction,
         state,
+        rotationThreshold,
       )
       break
   }
@@ -512,6 +515,7 @@ export function move(
   rainNode: SceneGraphNode,
   sunNode: SceneGraphNode,
   state: { isEnded: boolean },
+  roationThreshold: number,
 ) {
   const isApproaching = reunion.phase === 'approaching'
   const isRunning =
@@ -552,7 +556,15 @@ export function move(
       if (worldZ < WEATHER_ZONE.SNOW_START) updateBgm(dt)
       updateSnow(snowNode, worldZ, isRunning, node.children[0].source as TRS)
       updateRainAndCloud(cloudNode, rainNode, worldZ, time, dt)
-      updateSunAndLeaf(node, sunNode, worldZ, time, interaction, state)
+      updateSunAndLeaf(
+        node,
+        sunNode,
+        worldZ,
+        time,
+        interaction,
+        state,
+        roationThreshold,
+      )
     }
   })
 

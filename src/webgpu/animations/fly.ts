@@ -183,10 +183,11 @@ export function fly(
   animationNode: SceneGraphNode[],
   time: number,
   interaction: ReturnType<typeof createInteractionState>,
+  rotationThreshold: number,
 ) {
   const absRotation = Math.abs(interaction.rotationY)
 
-  if (absRotation > 80 && flyStartTime === -1) {
+  if (absRotation > rotationThreshold && flyStartTime === -1) {
     flyStartTime = time
     startRotation = interaction.rotationY
     rotationDirection = Math.sign(interaction.rotationY)
