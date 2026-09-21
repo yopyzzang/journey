@@ -8,12 +8,9 @@ import {
   addTRSSceneGraphNode,
   animNodes,
   createVertices,
-  meshes,
+  meshes
 } from '../../webgpu/utils/object.js'
-import {
-  createCarrotLeafVertices,
-  createCarrotVertices,
-} from '../../webgpu/geometry/carrot.js'
+import { createCarrotLeafVertices, createCarrotVertices } from '../../webgpu/geometry/carrot.js'
 import { SceneGraphNode } from '../../webgpu/utils/scene-graph.js'
 import { degToRad } from '../../webgpu/utils/math.js'
 import { createInteractionState } from '../../webgpu/utils/interation.js'
@@ -50,6 +47,11 @@ async function main() {
     device,
     format,
   )
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
+  const rainCount = isMobile ? 4000 : 10000
+  const snowCount = isMobile ? 5000 : 12000
+  const cloudCount = isMobile ? 20 : 40
+
   resizeObserver(canvas, device, dpr)
 
   const interaction = createInteractionState(canvas)
@@ -61,7 +63,7 @@ async function main() {
   const carrotLeafVertices = createVertices('carrot-leaf', device, carrotLeaf)
   addRootObject('carrot', root, 0, carrotVertices, pipeline, carrotLeafVertices)
 
-  const snow = createSnowVertices(12000, 100, 300)
+  const snow = createSnowVertices(snowCount, 100, 300)
   const snowVertices = createVertices('snow', device, snow)
   const snowNode = addTRSSceneGraphNode('snow-root', root, {
     translation: [0, 70, 0],
@@ -76,7 +78,7 @@ async function main() {
     [1, 1, 1],
   )
 
-  const cloud = createCloudVertices(40, 4000, 600)
+  const cloud = createCloudVertices(cloudCount, 4000, 600)
   const cloudVertices = createVertices('cloud', device, cloud)
   const cloudNode = addTRSSceneGraphNode('cloud-root', root, {
     translation: [0, 800, -2000],
@@ -92,7 +94,7 @@ async function main() {
     [1, 1, 1],
   )
 
-  const rain = createRainVertices(14000, 1000, 1000, 4000)
+  const rain = createRainVertices(rainCount, 1000, 400, 4000)
   const rainVertices = createVertices('rain', device, rain)
   const rainNode = addTRSSceneGraphNode('rain-root', root, {
     translation: [0, 1500, -950],
