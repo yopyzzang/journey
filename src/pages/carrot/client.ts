@@ -48,9 +48,13 @@ async function main() {
     format,
   )
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
-  const rainCount = isMobile ? 4000 : 10000
   const snowCount = isMobile ? 5000 : 12000
-  const cloudCount = isMobile ? 20 : 40
+  const cloudOptions = isMobile
+    ? { count: 15, spreadX: 1000, spreadZ: 600 }
+    : { count: 40, spreadX: 4000, spreadZ: 600 }
+  const rainOptions = isMobile
+    ? { count: 3000, spreadX: 500, spreadZ: 200, height: 4000 }
+    : { count: 10000, spreadX: 1000, spreadZ: 400, height: 4000 }
 
   resizeObserver(canvas, device, dpr)
 
@@ -78,7 +82,11 @@ async function main() {
     [1, 1, 1],
   )
 
-  const cloud = createCloudVertices(cloudCount, 4000, 600)
+  const cloud = createCloudVertices(
+    cloudOptions.count,
+    cloudOptions.spreadX,
+    cloudOptions.spreadZ,
+  )
   const cloudVertices = createVertices('cloud', device, cloud)
   const cloudNode = addTRSSceneGraphNode('cloud-root', root, {
     translation: [0, 800, -2000],
@@ -94,7 +102,12 @@ async function main() {
     [1, 1, 1],
   )
 
-  const rain = createRainVertices(rainCount, 1000, 400, 4000)
+  const rain = createRainVertices(
+    rainOptions.count,
+    rainOptions.spreadX,
+    rainOptions.spreadZ,
+    rainOptions.height,
+  )
   const rainVertices = createVertices('rain', device, rain)
   const rainNode = addTRSSceneGraphNode('rain-root', root, {
     translation: [0, 1500, -950],
