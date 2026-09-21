@@ -13,12 +13,6 @@ const MAX_DT = 0.05
 const FALLBACK_DT = 0.016
 const INTRO_SUBTITLE_DURATION = 0.5
 
-// const WEATHER_ZONE = {
-//   SNOW_START: -30,
-//   SNOW_END: -400,
-//   RAIN_START: -550,
-//   RAIN_END: -850,
-// } as const
 const WEATHER_ZONE = {
   SNOW_START: -30,
   SNOW_END: -330,
@@ -351,7 +345,7 @@ function updateCombinedFlight(
   const absRotation = Math.abs(interaction.rotationY)
 
   if (reunion.flyStartTime === -1) {
-    if (absRotation > 150) {
+    if (absRotation > 100) {
       reunion.flyStartTime = time
     }
   }

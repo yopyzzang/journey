@@ -186,7 +186,7 @@ export function fly(
 ) {
   const absRotation = Math.abs(interaction.rotationY)
 
-  if (absRotation > 150 && flyStartTime === -1) {
+  if (absRotation > 80 && flyStartTime === -1) {
     flyStartTime = time
     startRotation = interaction.rotationY
     rotationDirection = Math.sign(interaction.rotationY)

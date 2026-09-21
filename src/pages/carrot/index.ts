@@ -2,7 +2,7 @@ export async function renderPage() {
   const html = `
 <canvas></canvas>
 <div id="ui-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-  <div id="subtitle" style="position: absolute; top: 60%; width: 100%; text-align: center; color: white; font-size: 24px; font-weight: bold; line-height: 1.4; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); white-space: pre-wrap; transition: opacity 0.3s;">
+  <div id="subtitle" style="position: absolute; top: 60%; width: 100%; text-align: center; color: white; font-size: clamp(16px, 4vw, 24px); font-weight: bold; line-height: 1.4; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); white-space: pre-wrap; transition: opacity 0.3s;">
   </div>
 </div>
 <div id="fade-out" style="position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; transition: opacity 2s ease-in;">
