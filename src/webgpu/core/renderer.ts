@@ -93,6 +93,14 @@ export function renderer(
   root.updateWorldMatrix()
 
   for (const mesh of meshes) {
+    if (mesh.node.name === 'snow-mesh' && targetSource.translation[2] <= -450)
+      continue
+    if (mesh.node.name === 'rain-mesh' && targetSource.translation[2] >= -450)
+      continue
+    if (mesh.node.name === 'cloud-mesh' && targetSource.translation[2] >= -450)
+      continue
+    if (mesh.node.name === 'sun-mesh' && targetSource.translation[2] >= -680)
+      continue
     drawMesh(device, ctx, mesh)
   }
 
