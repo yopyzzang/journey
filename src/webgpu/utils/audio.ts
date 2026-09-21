@@ -1,32 +1,62 @@
-let bgm: HTMLAudioElement | null = null
+let audioCtx: AudioContext | null = null
+let bgmBuffer: AudioBuffer | null = null
+let gainNode: GainNode | null = null
+let bgmSource: AudioBufferSourceNode | null = null
 let hasStartedAudible = false
 
 const BGM_SRC = '/music/The_Earnest_Star.mp3'
 const BGM_TARGET_VOLUME = 0.4
 const BGM_FADE_RATE = 0.15
 
-export function unlockBgm() {
-  if (bgm) return
+async function loadBgm() {
+  if (bgmBuffer) return
+  const AudioContextClass =
+    window.AudioContext || (window as any).webkitAudioContext
+  audioCtx = new AudioContextClass()
 
-  bgm = new Audio(BGM_SRC)
-  bgm.loop = true
-  bgm.volume = 0
-  bgm.play().catch((err) => {
-    console.error(err.name, err.message)
+  const response = await fetch(BGM_SRC)
+  const arrayBuffer = await response.arrayBuffer()
+  bgmBuffer = await audioCtx.decodeAudioData(arrayBuffer)
+}
 
-    if (err.name === 'NotAllowedError') {
-      bgm = null
-    }
-  })
+export async function unlockBgm() {
+  if (!audioCtx || !bgmBuffer) {
+    await loadBgm()
+  }
+
+  if (audioCtx?.state === 'suspended') {
+    await audioCtx.resume()
+  }
 }
 
 export function updateBgm(dt: number) {
-  if (!bgm) return
+  if (!audioCtx || !bgmBuffer) return
 
   if (!hasStartedAudible) {
     hasStartedAudible = true
-    bgm.currentTime = 0
+
+    bgmSource = audioCtx.createBufferSource()
+    bgmSource.buffer = bgmBuffer
+    bgmSource.loop = true
+
+    gainNode = audioCtx.createGain()
+
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
+
+    bgmSource.connect(gainNode)
+    gainNode.connect(audioCtx.destination)
+
+    bgmSource.start(0)
   }
 
-  bgm.volume = Math.min(BGM_TARGET_VOLUME, bgm.volume + BGM_FADE_RATE * dt)
+  if (gainNode) {
+    const currentVolume = gainNode.gain.value
+    if (currentVolume < BGM_TARGET_VOLUME) {
+      const nextVolume = Math.min(
+        BGM_TARGET_VOLUME,
+        currentVolume + BGM_FADE_RATE * dt,
+      )
+      gainNode.gain.setValueAtTime(nextVolume, audioCtx.currentTime)
+    }
+  }
 }
